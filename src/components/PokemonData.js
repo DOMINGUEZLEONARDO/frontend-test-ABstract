@@ -19,14 +19,24 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function PokemonData({ pokemon }) {
+export default function PokemonData({ pokemon, addCatchedPokemon }) {
   const [catched, setCatched] = useState(false);
+  
+  const handleCatched = async () => {
+    const body = {
+      id: pokemon.id,
+      name: pokemon.name,
+    }
+    await axios.post("http://localhost:3000/api/catched", body);
+    setCatched(true)
+    addCatchedPokemon(body);
+  }
 
   return (
     <Stack spacing="5" pb="5">
       <Stack spacing="5" position="relative">
         <Box position="absolute" right="0" zIndex="99">
-          <Checkbox>Catched</Checkbox>
+          <Checkbox onChange={handleCatched} value={catched}>Catched</Checkbox>
         </Box>
         <AspectRatio w="full" ratio={1}>
           <Image

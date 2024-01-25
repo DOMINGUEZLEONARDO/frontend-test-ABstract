@@ -1,5 +1,4 @@
 import Head from "next/head";
-
 import { Inter, Island_Moments } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import axios from "axios";
@@ -20,6 +19,13 @@ import {
   ModalContent,
   ModalCloseButton,
   useDisclosure,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
 import PokemonCard from "@/components/PokemonCard";
 import PokemonData from "@/components/PokemonData";
@@ -30,13 +36,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [pokemon, setPokemon] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState();
-  const [currentPage, setCurrentPage] = useState(
-    "https://pokeapi.co/api/v2/pokemon/?limit=20&offset=0"
-  );
+  const [currentPage, setCurrentPage] = useState(0);
+  const [catchedPokemons, setCatchedPokemons] = useState();
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get(currentPage).then(async ({ data }) => {
+    axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${currentPage*20}`).then(async ({ data }) => {
       const promises = data.results.map((result) => axios(result.url));
       const fetchedPokemon = (await Promise.all(promises)).map(
         (res) => res.data
@@ -46,11 +51,23 @@ export default function Home() {
     });
   }, [currentPage]);
 
-  function handleNextPage() {}
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/catched`).then(async ({ data }) => {
+      setCatchedPokemons(data)
+    });
+  }, [])
+
+  function handleNextPage() {
+    setCurrentPage(currentPage+1);
+  }
 
   function handleViewPokemon(pokemon) {
     setSelectedPokemon(pokemon);
     pokemonDataModal.onOpen();
+  }
+
+  function addCatchedPokemon(body) {
+    setCatchedPokemons([...catchedPokemons, body])
   }
 
   return (
@@ -61,39 +78,87 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Flex alignItems="center" minH="100vh" justifyContent="center">
-        <Container maxW="container.lg">
-          <Stack p="5" alignItems="center" spacing="5">
-            <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
-              {pokemon.map((pokemon) => (
-                <Box
-                  as="button"
-                  key={pokemon.id}
-                  onClick={() => handleViewPokemon(pokemon)}
-                >
-                  <PokemonCard pokemon={pokemon} />
-                </Box>
-              ))}
-            </SimpleGrid>
+      <Tabs>
+        <TabList>
+          <Tab>All Pokemons</Tab>
+          <Tab>Catched Pokemons</Tab>
+        </TabList>
 
-            <Button isLoading={false} onClick={handleNextPage}>
-              Cargas más
-            </Button>
-          </Stack>
-        </Container>
-      </Flex>
-      <Modal {...pokemonDataModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader textTransform="capitalize">
-            {selectedPokemon?.name}
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {selectedPokemon && <PokemonData pokemon={selectedPokemon} />}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+        <TabPanels>
+          <TabPanel>
+            <Flex alignItems="center" minH="100vh" justifyContent="center">
+              <Container maxW="container.lg">
+                <Stack p="5" alignItems="center" spacing="5">
+                  <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
+                    {pokemon.map((pokemon) => (
+                      <Box
+                        as="button"
+                        key={pokemon.id}
+                        onClick={() => handleViewPokemon(pokemon)}
+                      >
+                        <PokemonCard pokemon={pokemon} />
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+
+                  <Button isLoading={false} onClick={handleNextPage}>
+                    Cargas más
+                  </Button>
+                </Stack>
+              </Container>
+            </Flex>
+            <Modal {...pokemonDataModal}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader textTransform="capitalize">
+                  {selectedPokemon?.name}
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  {selectedPokemon && <PokemonData pokemon={selectedPokemon} addCatchedPokemon={addCatchedPokemon}/>}
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+          </TabPanel>
+          <TabPanel>
+            {/* <Flex alignItems="center" minH="100vh" justifyContent="center">
+              <Container maxW="container.lg">
+                <Stack p="5" alignItems="center" spacing="5">
+                  <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
+                    {pokemon.map((pokemon) => (
+                      <Box
+                        as="button"
+                        key={pokemon.id}
+                        onClick={() => handleViewPokemon(pokemon)}
+                      >
+                        <PokemonCard pokemon={pokemon} />
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                </Stack>
+              </Container>
+            </Flex> */}
+            {/* <ul>
+              { catchedPokemons && catchedPokemons.map( pokemon => {
+                return <li key={pokemon.id}>{pokemon.name}</li>
+              } ) }
+            </ul> */}
+            <List spacing={3}>
+              {catchedPokemons && catchedPokemons.map(({name, id}) => (
+                <ListItem key={id}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box>{name.toUpperCase()}</Box>
+                    <Button colorScheme="red">
+                      Eliminar
+                    </Button>
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+      
     </>
   );
 }
