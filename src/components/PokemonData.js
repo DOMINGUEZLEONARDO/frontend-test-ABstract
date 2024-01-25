@@ -21,38 +21,52 @@ import {
   AlertDescription,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { Chau_Philomene_One, Sansita_Swashed } from "next/font/google";
 import { useEffect, useState } from "react";
 
-export default function PokemonData({ pokemon, addCatchedPokemon, catChedPokemon }) {
+export default function PokemonData({ pokemon, addCatchedPokemon }) {
   const [catched, setCatched] = useState(false);
-  const [pokemonCapturar, setPokemonCapturar]=useState(false)
-  const [pokemonYaCapturado, setPokemonYaCapturado]=useState(false)
+  const [pokemonCapturar, setPokemonCapturar] = useState(false)
+  const [pokemonYaCapturado, setPokemonYaCapturado] = useState(false)
+  const [error, setError] = useState(false)
 
-  console.log('catched',catChedPokemon)
-  
+  useEffect(() => {
+    const fetchCatchedPokemon = async () => {
+      try{
+        const response = await axios.get("http://localhost:3000/api/catched");
+        const catchedPokemons = response.data;
+        const isCatched = catchedPokemons.some(p => p.id === pokemon.id);
+        setPokemonYaCapturado(isCatched);
+      }catch(error){
+        console.error("error al obtener pokemons capturados", error)
+      }
+    };
+     fetchCatchedPokemon();
+    
+  }, [pokemon.id]);
 
   const handleCatched = async () => {
     const body = {
       id: pokemon.id,
       name: pokemon.name,
     }
-   
     
-    await axios.post("http://localhost:3000/api/catched", body);
-    setCatched(true)
-    setPokemonCapturar(true)
-    addCatchedPokemon(body); 
+    try{
+      await axios.post("http://localhost:3000/api/catched", body);
+      setCatched(true)
+      setPokemonCapturar(true)
+      addCatchedPokemon(body); 
 
-        
-       
-  }
- 
-  
+    }catch(error){
+      setError(true)     
+     
+    }      
+  }  
   setTimeout(() => {
     setPokemonCapturar(false);
-  }, 2000);
+  }, 2500);
+    
   
-
   return (
     
     <Stack spacing="5" pb="5">
@@ -60,14 +74,18 @@ export default function PokemonData({ pokemon, addCatchedPokemon, catChedPokemon
         <Box position="absolute" right="0" zIndex="99">
           <Checkbox onChange={handleCatched} value={catched}>Catched</Checkbox>
         </Box>        
-        {pokemonCapturar && (<Alert status='success'  padding={3} marginTop={6} >
+        {pokemonCapturar && (<Alert status='success'  padding={3} marginTop={6} fontFamily={"sans-serif"} fontSize="18">
           <AlertIcon />
            Has capturado a un nuevo Pokemon
         </Alert>)}
-        {pokemonYaCapturado && ( <Alert status='success' padding={3} marginTop={6}>
+        {pokemonYaCapturado && ( <Alert status='warning' padding={3} marginTop={6} fontFamily={"sans-serif"} fontSize="18">
           <AlertIcon />
-          Este pokemon ya lo tienes captura en tu pokebola
+          Este pokemon ya lo tienes capturado en tu Pokebola
         </Alert>)}
+        {error && <Alert status='error'>
+          <AlertIcon />
+          No se ha podido capturar el pokemon
+      </Alert>}
         <AspectRatio w="full" ratio={1}>
           <Image
             objectFit="contain"

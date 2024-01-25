@@ -5,40 +5,39 @@ import axios from "axios";
 const inter = Inter({ subsets: ["latin"] });
 import { useEffect, useState } from "react";
 import {
-  Container,
-  Stack,
-  Input,
-  Button,
-  SimpleGrid,
-  Flex,
   Box,
-  Modal,
-  ModalOverlay,
-  ModalHeader,
-  ModalBody,
-  ModalContent,
-  ModalCloseButton,
-  useDisclosure,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  List,
-  ListItem,
+  Button,
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
-  Heading,
+  CardHeader,
   Center,
+  Container,
+  Flex,
+  Heading,
+  Input,
+  List,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  SimpleGrid,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  useDisclosure,
 } from "@chakra-ui/react";
 import PokemonCard from "@/components/PokemonCard";
 import PokemonData from "@/components/PokemonData";
 
 export default function Home() {
   const pokemonDataModal = useDisclosure();
-
   const [isLoading, setIsLoading] = useState(false);
   const [pokemon, setPokemon] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState();
@@ -84,7 +83,7 @@ export default function Home() {
         prevCatched.filter((pokemon) => pokemon.id !== pokemonId)
       );
 
-    }catch (erro){
+    }catch (error){
       console.error('Error al eliminar el pokemon', error);
     }
     
@@ -180,8 +179,7 @@ export default function Home() {
                   </SimpleGrid>
                 </Stack>
               </Container>
-           </Flex>
-                        
+           </Flex>                        
             {/* <List spacing={3}>
               {catchedPokemons && catchedPokemons.map(({name, id}) => (
                 <ListItem key={id}>
@@ -196,8 +194,7 @@ export default function Home() {
             </List> */}
           </TabPanel>
         </TabPanels>
-      </Tabs>
-      
+      </Tabs>      
     </>
   );
 }
