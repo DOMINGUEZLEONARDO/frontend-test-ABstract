@@ -26,19 +26,23 @@ import { useEffect, useState } from "react";
 export default function PokemonData({ pokemon, addCatchedPokemon }) {
   const [catched, setCatched] = useState(false);
   const [pokemonCapturar, setPokemonCapturar]=useState(false)
-  const [pokemonCapturado, setPokemonCapturado]=useState(false)
+  const [pokemonYaCapturado, setPokemonYaCapturado]=useState(false)
+  
 
   const handleCatched = async () => {
     const body = {
       id: pokemon.id,
       name: pokemon.name,
     }
+    
     await axios.post("http://localhost:3000/api/catched", body);
     setCatched(true)
     setPokemonCapturar(true)
-    addCatchedPokemon(body);
-   
+    addCatchedPokemon(body);       
   }
+  setTimeout(() => {
+    setPokemonCapturar(false);
+  }, 3000);
   
 
   return (
@@ -48,14 +52,14 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
         <Box position="absolute" right="0" zIndex="99">
           <Checkbox onChange={handleCatched} value={catched}>Catched</Checkbox>
         </Box>        
-        {pokemonCapturar && <Alert status='success' padding={3} marginTop={6}>
+        {pokemonCapturar && <Alert status='success'  padding={3} marginTop={6} >
           <AlertIcon />
-          El Pokemon ha sido capturado
+           Has capturado a un nuevo Pokemon
         </Alert>}
-        {pokemonCapturado && <Alert status='success' padding={3} marginTop={6}>
+        {/* {pokemonYaCapturado && <Alert status='success' padding={3} marginTop={6}>
           <AlertIcon />
           Este pokemon ya lo tienes captura en tu pokebola
-        </Alert>}
+        </Alert>} */}
         <AspectRatio w="full" ratio={1}>
           <Image
             objectFit="contain"

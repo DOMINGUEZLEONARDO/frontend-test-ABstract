@@ -71,6 +71,19 @@ export default function Home() {
     setCatchedPokemons([...catchedPokemons, body])
     
   }
+  const handleEliminar = async (pokemonId) => {
+    try{
+      await axios.delete(`http://localhost:3000/api/catched/${pokemonId}`);
+      setCatchedPokemons((prevCatched) =>
+        prevCatched.filter((pokemon) => pokemon.id !== pokemonId)
+      );
+
+    }catch (erro){
+      console.error('Error al eliminar el pokemon', error);
+    }
+    
+    
+  }
 
   return (
     <>
@@ -150,7 +163,7 @@ export default function Home() {
                 <ListItem key={id}>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Box>{name.toUpperCase()}</Box>
-                    <Button colorScheme="red">
+                    <Button colorScheme="red" onClick= {() => handleEliminar(id)}>
                       Eliminar
                     </Button>
                   </Box>
