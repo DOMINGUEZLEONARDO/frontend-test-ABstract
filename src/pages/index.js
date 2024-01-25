@@ -26,6 +26,12 @@ import {
   TabPanel,
   List,
   ListItem,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Heading,
+  Center,
 } from "@chakra-ui/react";
 import PokemonCard from "@/components/PokemonCard";
 import PokemonData from "@/components/PokemonData";
@@ -95,12 +101,12 @@ export default function Home() {
       </Head>
       <Tabs>
         <TabList>
-          <Tab>All Pokemons</Tab>
-          <Tab>Catched Pokemons</Tab>
-        </TabList>
-
+          <Tab marginTop="24px" marginLeft="24px">All Pokemons</Tab>
+          <Tab marginTop="24px" marginLeft="24px">Catched Pokemons</Tab>
+        </TabList>        
         <TabPanels>
-          <TabPanel>
+          <TabPanel marginLeft={3} marginTop={3}>
+            <p>Capturá tu Pokemon</p>
             <Flex alignItems="center" minH="100vh" justifyContent="center">
               <Container maxW="container.lg">
                 <Stack p="5" alignItems="center" spacing="5">
@@ -115,7 +121,6 @@ export default function Home() {
                       </Box>
                     ))}
                   </SimpleGrid>
-
                   <Button isLoading={false} onClick={handleNextPage}>
                     Cargas más
                   </Button>
@@ -130,35 +135,54 @@ export default function Home() {
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                  {selectedPokemon && <PokemonData pokemon={selectedPokemon} addCatchedPokemon={addCatchedPokemon}/>}
+                  {selectedPokemon && <PokemonData pokemon={selectedPokemon} addCatchedPokemon={addCatchedPokemon} catchedPokemons={catchedPokemons}/>}
                 </ModalBody>
               </ModalContent>
             </Modal>
           </TabPanel>
-          <TabPanel>
-            {/* <Flex alignItems="center" minH="100vh" justifyContent="center">
+          <TabPanel marginLeft={3} marginTop={3}>
+            <Flex minH="100vh" justifyContent="center">
               <Container maxW="container.lg">
                 <Stack p="5" alignItems="center" spacing="5">
-                  <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
-                    {pokemon.map((pokemon) => (
-                      <Box
-                        as="button"
-                        key={pokemon.id}
-                        onClick={() => handleViewPokemon(pokemon)}
-                      >
-                        <PokemonCard pokemon={pokemon} />
-                      </Box>
-                    ))}
+                  {/* <Flex alignItems="center" minH="100vh" justifyContent="center">
+                  <Container maxW="container.lg">
+                  <Stack p="5" alignItems="center" spacing="5">
+                    <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
+                      {pokemon.map((pokemon) => (
+                        <Box
+                          as="button"
+                          key={pokemon.id}
+                          onClick={() => handleViewPokemon(pokemon)}
+                        >
+                          <PokemonCard pokemon={pokemon} />
+                        </Box>
+                      ))}
+                    </SimpleGrid>
+                  </Stack>
+                  </Container>
+                  </Flex> */}
+                      { /* <ul>
+                    { catchedPokemons && catchedPokemons.map( pokemon => {
+                      return <li key={pokemon.id}>{pokemon.name}</li>
+                    } ) }
+                  </ul> */}
+                  <SimpleGrid spacing={5} templateColumns='repeat(4, minmax(200px, 1fr))'>
+                    {catchedPokemons && catchedPokemons.map(({name, id}) => (<Card key={id}>
+                      <CardHeader textAlign="Center">
+                        <Heading size='md'>{name.toUpperCase()}</Heading>
+                      </CardHeader>               
+                        <CardFooter display="flex" alignItems="center" justifyContent="center">
+                          <Button colorScheme="red" alignItems="center" onClick= {() => handleEliminar(id)}>
+                            Eliminar
+                          </Button>
+                        </CardFooter>
+                    </Card>))}
                   </SimpleGrid>
                 </Stack>
               </Container>
-            </Flex> */}
-            {/* <ul>
-              { catchedPokemons && catchedPokemons.map( pokemon => {
-                return <li key={pokemon.id}>{pokemon.name}</li>
-              } ) }
-            </ul> */}
-            <List spacing={3}>
+           </Flex>
+                        
+            {/* <List spacing={3}>
               {catchedPokemons && catchedPokemons.map(({name, id}) => (
                 <ListItem key={id}>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -169,7 +193,7 @@ export default function Home() {
                   </Box>
                 </ListItem>
               ))}
-            </List>
+            </List> */}
           </TabPanel>
         </TabPanels>
       </Tabs>
