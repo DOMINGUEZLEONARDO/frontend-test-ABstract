@@ -15,13 +15,19 @@ import {
   Badge,
   HStack,
   Checkbox,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function PokemonData({ pokemon, addCatchedPokemon }) {
   const [catched, setCatched] = useState(false);
-  
+  const [pokemonCapturar, setPokemonCapturar]=useState(false)
+  const [pokemonCapturado, setPokemonCapturado]=useState(false)
+
   const handleCatched = async () => {
     const body = {
       id: pokemon.id,
@@ -29,15 +35,27 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
     }
     await axios.post("http://localhost:3000/api/catched", body);
     setCatched(true)
+    setPokemonCapturar(true)
     addCatchedPokemon(body);
+   
   }
+  
 
   return (
+    
     <Stack spacing="5" pb="5">
       <Stack spacing="5" position="relative">
         <Box position="absolute" right="0" zIndex="99">
           <Checkbox onChange={handleCatched} value={catched}>Catched</Checkbox>
-        </Box>
+        </Box>        
+        {pokemonCapturar && <Alert status='success' padding={3} marginTop={6}>
+          <AlertIcon />
+          El Pokemon ha sido capturado
+        </Alert>}
+        {pokemonCapturado && <Alert status='success' padding={3} marginTop={6}>
+          <AlertIcon />
+          Este pokemon ya lo tienes captura en tu pokebola
+        </Alert>}
         <AspectRatio w="full" ratio={1}>
           <Image
             objectFit="contain"
@@ -60,8 +78,11 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
           <Stack>
             <Text fontSize="sm">Tipos</Text>
             <HStack>
-              <Badge>Agua</Badge>
-              <Badge>Agua</Badge>
+              {pokemon.types.map((type) => (
+                <Badge size="xs" key={type.slot}>
+                  {type.type.name}
+                 </Badge>
+              ))}
             </HStack>
           </Stack>
         </Stack>

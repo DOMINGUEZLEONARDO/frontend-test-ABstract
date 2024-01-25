@@ -38,6 +38,7 @@ export default function Home() {
   const [selectedPokemon, setSelectedPokemon] = useState();
   const [currentPage, setCurrentPage] = useState(0);
   const [catchedPokemons, setCatchedPokemons] = useState();
+  
 
   useEffect(() => {
     setIsLoading(true);
@@ -68,6 +69,7 @@ export default function Home() {
 
   function addCatchedPokemon(body) {
     setCatchedPokemons([...catchedPokemons, body])
+    
   }
 
   return (
@@ -107,7 +109,7 @@ export default function Home() {
                 </Stack>
               </Container>
             </Flex>
-            <Modal {...pokemonDataModal}>
+           <Modal {...pokemonDataModal}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader textTransform="capitalize">
