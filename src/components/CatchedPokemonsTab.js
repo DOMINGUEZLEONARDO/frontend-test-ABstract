@@ -8,8 +8,7 @@ import {
   Flex,
   Heading,
   SimpleGrid,
-  Stack,
-  useDisclosure,
+  Stack,  
 } from "@chakra-ui/react";
 
 const CatchedPokemonsTab = ({ catchedPokemons, handleDelete }) => {

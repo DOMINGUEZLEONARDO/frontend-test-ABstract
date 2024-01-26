@@ -20,7 +20,8 @@ export default function PokemonCard({ pokemon }) {
       <AspectRatio w="full" ratio={1}>
         <Image
           src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png`}
-          alt={pokemon.name}/>
+          alt={pokemon.name}
+        />
       </AspectRatio>
       <Text textAlign="center" textTransform="Capitalize">
         {pokemon.name}

@@ -6,14 +6,12 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  Tabs,
-  useDisclosure,
+  Tabs,  
 } from "@chakra-ui/react";
 import AllPokemonsTab from "@/components/AllPokemonsTab";
 import CatchedPokemonsTab from "@/components/CatchedPokemonsTab";
 
-export default function Home() {
-  const pokemonDataModal = useDisclosure();
+export default function Home() { 
   const [isLoading, setIsLoading] = useState(false);
   const [pokemon, setPokemon] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);

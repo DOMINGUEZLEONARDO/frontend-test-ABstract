@@ -91,10 +91,11 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
           </Alert>
         )}
         <AspectRatio w="full" ratio={1}>
-          <Image            
+          <Image
             objectFit="contain"
             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png`}
-            alt={pokemon.name}/>
+            alt={pokemon.name}
+          />
         </AspectRatio>
         <Stack direction="row" spacing="5">
           <Stack>
