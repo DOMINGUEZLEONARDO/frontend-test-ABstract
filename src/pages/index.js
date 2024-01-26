@@ -1,31 +1,7 @@
 import Head from "next/head";
-import { Inter, Island_Moments } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 import axios from "axios";
-const inter = Inter({ subsets: ["latin"] });
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Center,
-  Container,
-  Flex,
-  Heading,
-  Input,
-  List,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  SimpleGrid,
-  Stack,
+import {   
   Tab,
   TabList,
   TabPanel,
@@ -33,50 +9,46 @@ import {
   Tabs,
   useDisclosure,
 } from "@chakra-ui/react";
-import PokemonCard from "@/components/PokemonCard";
-import PokemonData from "@/components/PokemonData";
+import AllPokemonsTab from "@/components/AllPokemonsTab";
+import CatchedPokemonsTab from "@/components/CatchedPokemonsTab";
 
 export default function Home() {
   const pokemonDataModal = useDisclosure();
   const [isLoading, setIsLoading] = useState(false);
-  const [pokemon, setPokemon] = useState([]);
-  const [selectedPokemon, setSelectedPokemon] = useState();
+  const [pokemon, setPokemon] = useState([]);  
   const [currentPage, setCurrentPage] = useState(0);
   const [catchedPokemons, setCatchedPokemons] = useState();
-  
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${currentPage*20}`).then(async ({ data }) => {
-      const promises = data.results.map((result) => axios(result.url));
-      const fetchedPokemon = (await Promise.all(promises)).map(
-        (res) => res.data
-      );
-      setPokemon((prev) => [...prev, ...fetchedPokemon]);
-      setIsLoading(false);
-    });
+    axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${currentPage*20}`)
+      .then(async ({ data }) => {
+        const promises = data.results.map((result) => axios(result.url));
+        const fetchedPokemon = (await Promise.all(promises)).map(
+          (res) => res.data
+        );
+        setPokemon((prev) => [...prev, ...fetchedPokemon]);
+        setIsLoading(false);
+        console.log("isloading", isLoading)
+      })
+      .catch(error => console.error('Error loading the Pokémon list.', error));
   }, [currentPage]);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/api/catched`).then(async ({ data }) => {
-      setCatchedPokemons(data)
-    });
+    try{
+      axios.get(`http://localhost:3000/api/catched`).then(async ({ data }) => {
+        setCatchedPokemons(data)
+      });
+    }catch(error){
+      console.error('Error loading captured Pokémon', error)
+    }
   }, [])
 
   function handleNextPage() {
     setCurrentPage(currentPage+1);
   }
 
-  function handleViewPokemon(pokemon) {
-    setSelectedPokemon(pokemon);
-    pokemonDataModal.onOpen();
-  }
-
-  function addCatchedPokemon(body) {
-    setCatchedPokemons([...catchedPokemons, body])
-    
-  }
-  const handleEliminar = async (pokemonId) => {
+  const handleDelete = async (pokemonId) => {
     try{
       await axios.delete(`http://localhost:3000/api/catched/${pokemonId}`);
       setCatchedPokemons((prevCatched) =>
@@ -84,12 +56,10 @@ export default function Home() {
       );
 
     }catch (error){
-      console.error('Error al eliminar el pokemon', error);
+      console.error('Error deleting the Pokémon', error);
     }
-    
-    
   }
-
+  
   return (
     <>
       <Head>
@@ -99,99 +69,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Tabs>
-        <TabList>
-          <Tab marginTop="24px" marginLeft="24px">All Pokemons</Tab>
-          <Tab marginTop="24px" marginLeft="24px">Catched Pokemons</Tab>
-        </TabList>        
+        <TabList justifyContent="left"  flexDirection={{ base: 'column', md: 'row' }}>
+          <Tab marginTop={{ base: '2', md: '24px' }} marginLeft={{ base: '2', md: '24px' }}fontWeight={500}>All Pokemons</Tab>
+          <Tab marginTop={{ base: '2', md: '24px' }} marginLeft={{ base: '2', md: '24px' }} fontWeight={500}>Catched Pokemons</Tab>
+        </TabList>       
         <TabPanels>
-          <TabPanel marginLeft={3} marginTop={3}>
-            <p>Capturá tu Pokemon</p>
-            <Flex alignItems="center" minH="100vh" justifyContent="center">
-              <Container maxW="container.lg">
-                <Stack p="5" alignItems="center" spacing="5">
-                  <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
-                    {pokemon.map((pokemon) => (
-                      <Box
-                        as="button"
-                        key={pokemon.id}
-                        onClick={() => handleViewPokemon(pokemon)}
-                      >
-                        <PokemonCard pokemon={pokemon} />
-                      </Box>
-                    ))}
-                  </SimpleGrid>
-                  <Button isLoading={false} onClick={handleNextPage}>
-                    Cargas más
-                  </Button>
-                </Stack>
-              </Container>
-            </Flex>
-           <Modal {...pokemonDataModal}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader textTransform="capitalize">
-                  {selectedPokemon?.name}
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  {selectedPokemon && <PokemonData pokemon={selectedPokemon} addCatchedPokemon={addCatchedPokemon} catchedPokemons={catchedPokemons}/>}
-                </ModalBody>
-              </ModalContent>
-            </Modal>
+          <TabPanel marginLeft={3} marginTop={3}>            
+            <AllPokemonsTab pokemon={pokemon} handleNextPage={handleNextPage} catchedPokemons={catchedPokemons} setCatchedPokemons={setCatchedPokemons} isLoading={isLoading}/>
           </TabPanel>
-          <TabPanel marginLeft={3} marginTop={3}>
-            <Flex minH="100vh" justifyContent="center">
-              <Container maxW="container.lg">
-                <Stack p="5" alignItems="center" spacing="5">
-                  {/* <Flex alignItems="center" minH="100vh" justifyContent="center">
-                  <Container maxW="container.lg">
-                  <Stack p="5" alignItems="center" spacing="5">
-                    <SimpleGrid spacing="5" columns={{ base: 1, md: 5 }}>
-                      {pokemon.map((pokemon) => (
-                        <Box
-                          as="button"
-                          key={pokemon.id}
-                          onClick={() => handleViewPokemon(pokemon)}
-                        >
-                          <PokemonCard pokemon={pokemon} />
-                        </Box>
-                      ))}
-                    </SimpleGrid>
-                  </Stack>
-                  </Container>
-                  </Flex> */}
-                      { /* <ul>
-                    { catchedPokemons && catchedPokemons.map( pokemon => {
-                      return <li key={pokemon.id}>{pokemon.name}</li>
-                    } ) }
-                  </ul> */}
-                  <SimpleGrid spacing={5} templateColumns='repeat(4, minmax(200px, 1fr))'>
-                    {catchedPokemons && catchedPokemons.map(({name, id}) => (<Card key={id}>
-                      <CardHeader textAlign="Center">
-                        <Heading size='md'>{name.toUpperCase()}</Heading>
-                      </CardHeader>               
-                        <CardFooter display="flex" alignItems="center" justifyContent="center">
-                          <Button colorScheme="red" alignItems="center" onClick= {() => handleEliminar(id)}>
-                            Eliminar
-                          </Button>
-                        </CardFooter>
-                    </Card>))}
-                  </SimpleGrid>
-                </Stack>
-              </Container>
-           </Flex>                        
-            {/* <List spacing={3}>
-              {catchedPokemons && catchedPokemons.map(({name, id}) => (
-                <ListItem key={id}>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box>{name.toUpperCase()}</Box>
-                    <Button colorScheme="red" onClick= {() => handleEliminar(id)}>
-                      Eliminar
-                    </Button>
-                  </Box>
-                </ListItem>
-              ))}
-            </List> */}
+          <TabPanel marginLeft={3} marginTop={3}>                    
+            <CatchedPokemonsTab catchedPokemons={catchedPokemons} handleDelete={handleDelete}/>
           </TabPanel>
         </TabPanels>
       </Tabs>      

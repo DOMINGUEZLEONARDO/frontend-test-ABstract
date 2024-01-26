@@ -1,70 +1,60 @@
 import {
-  Box,
+  Alert,  
+  AlertIcon, 
   AspectRatio,
-  Image,
-  Stack,
-  SimpleGrid,
-  Heading,
-  Tabs,
-  TabList,
-  TabPanels,
-  TabPanel,
-  Progress,
-  Text,
-  Tab,
-  Badge,
-  HStack,
+  Box,
   Checkbox,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
+  Image,
+  Progress, 
+  Stack, 
+  Text,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { Chau_Philomene_One, Sansita_Swashed } from "next/font/google";
 import { useEffect, useState } from "react";
 
 export default function PokemonData({ pokemon, addCatchedPokemon }) {
-  const [catched, setCatched] = useState(false);
-  const [pokemonCapturar, setPokemonCapturar] = useState(false)
-  const [pokemonYaCapturado, setPokemonYaCapturado] = useState(false)
-  const [error, setError] = useState(false)
+  const [capturePokemon, setCapturePokemon] = useState(false)
+  const [caughtPokemon, setcaughtPokemon] = useState(false)
+  const [checkBox, setCheckBox] = useState(true)
 
   useEffect(() => {
     const fetchCatchedPokemon = async () => {
+      console.log(pokemon)
       try{
         const response = await axios.get("http://localhost:3000/api/catched");
         const catchedPokemons = response.data;
         const isCatched = catchedPokemons.some(p => p.id === pokemon.id);
-        setPokemonYaCapturado(isCatched);
+        setcaughtPokemon(isCatched);
       }catch(error){
-        console.error("error al obtener pokemons capturados", error)
+        console.error("Error obtaining captured Pokémon", error)
       }
     };
      fetchCatchedPokemon();
     
   }, [pokemon.id]);
 
+
   const handleCatched = async () => {
     const body = {
       id: pokemon.id,
       name: pokemon.name,
     }
-    
+  
     try{
       await axios.post("http://localhost:3000/api/catched", body);
-      setCatched(true)
-      setPokemonCapturar(true)
-      addCatchedPokemon(body); 
-
+      setCapturePokemon(true);
+      setTimeout(() => {
+        setCapturePokemon(false);
+        setcaughtPokemon(true);
+      }, 4000);
+      addCatchedPokemon(body);
+      setCheckBox(false);
     }catch(error){
-      setError(true)     
-     
+      console.error("Error capturing the Pokémon", error);
     }      
-  }  
-  setTimeout(() => {
-    setPokemonCapturar(false);
-  }, 2500);
+  }
+
+  const moves = Object.keys(pokemon.moves).length
     
   
   return (
@@ -72,20 +62,16 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
     <Stack spacing="5" pb="5">
       <Stack spacing="5" position="relative">
         <Box position="absolute" right="0" zIndex="99">
-          <Checkbox onChange={handleCatched} value={catched}>Catched</Checkbox>
+         {checkBox && !caughtPokemon && <Checkbox onChange={handleCatched}>Catched</Checkbox>}
         </Box>        
-        {pokemonCapturar && (<Alert status='success'  padding={3} marginTop={6} fontFamily={"sans-serif"} fontSize="18">
+        {capturePokemon && (<Alert status='success' height="70px"borderRadius={5} padding="8px" marginTop={6} fontFamily={"sans-serif"} fontSize="18">
           <AlertIcon />
-           Has capturado a un nuevo Pokemon
+          You have captured a new Pokémon.
         </Alert>)}
-        {pokemonYaCapturado && ( <Alert status='warning' padding={3} marginTop={6} fontFamily={"sans-serif"} fontSize="18">
+        {caughtPokemon && ( <Alert status='warning'  height="70px"borderRadius={5}padding="8px" marginTop={6} fontFamily={"sans-serif"} fontSize="18">
           <AlertIcon />
-          Este pokemon ya lo tienes capturado en tu Pokebola
-        </Alert>)}
-        {error && <Alert status='error'>
-          <AlertIcon />
-          No se ha podido capturar el pokemon
-      </Alert>}
+          You already have this Pokémon captured in your Pokéball.
+        </Alert>)}        
         <AspectRatio w="full" ratio={1}>
           <Image
             objectFit="contain"
@@ -94,26 +80,28 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
         </AspectRatio>
         <Stack direction="row" spacing="5">
           <Stack>
-            <Text fontSize="sm">Weight</Text>
-            <Text>20</Text>
+            <Text fontSize="sm" fontWeight={500}>Weight</Text>
+            <Text size="xs" textAlign="center">
+                  {pokemon.weight}
+             </Text>
           </Stack>
           <Stack>
-            <Text fontSize="sm">Height</Text>
-            <Text>12</Text>
+            <Text fontSize="sm" fontWeight={500}>Height</Text>           
+            <Text size="xs" textAlign="center" >
+                  {pokemon.height}
+            </Text>
           </Stack>
           <Stack>
-            <Text fontSize="sm">Movimientos</Text>
-            <Text>109</Text>
+            <Text fontSize="sm" fontWeight={500}>Moves</Text>
+            <Text textAlign="center" size="xs">{moves}</Text>
           </Stack>
           <Stack>
-            <Text fontSize="sm">Tipos</Text>
-            <HStack>
+            <Text fontSize="sm" fontWeight={500}>Types</Text>           
               {pokemon.types.map((type) => (
-                <Badge size="xs" key={type.slot}>
-                  {type.type.name}
-                 </Badge>
-              ))}
-            </HStack>
+                <Text textAlign="center"  size="xs" key={type.slot}>
+                  {(type.type.name).toUpperCase()}
+                 </Text>
+              ))}             
           </Stack>
         </Stack>
       </Stack>
