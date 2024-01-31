@@ -18,8 +18,7 @@ export default function PokemonData({ pokemon, addCatchedPokemon }) {
   const [checkBox, setCheckBox] = useState(true);
 
   useEffect(() => {
-    const fetchCatchedPokemon = async () => {
-      console.log(pokemon);
+    const fetchCatchedPokemon = async () => {     
       try {
         const response = await axios.get("http://localhost:3000/api/catched");
         const catchedPokemons = response.data;
